@@ -262,6 +262,7 @@
     }
     .reveal .slide:not(.center) {
       height: 100%;
+      overflow-y: auto;
     }
     .reveal .slide.scrollable {
       overflow-y: auto;
@@ -359,10 +360,6 @@ Phillip M. Alday
 </div>
 
 </section>
-<section class="slide level2">
-
-<p>let ord = sortperm(first.(within.coef)) labs = values(only.(keys(gdf)))[ord] # labels for panels f = clevelandaxes!(Figure(; resolution=(1000, 750)), labs, (2, 9)) for (axs, sdf) in zip(f.content, gdf[ord]) # iterate over the panels and groups scatter!(axs, sdf.day, sdf.speed) # add the points coef = simplelinreg(sdf.day, sdf.speed) abline!(axs, first(coef), last(coef)) # add the regression line end f end</p>
-</section>
 <section>
 <section id="the-general-linear-model" class="title-slide slide level1 center">
 <h1>The General Linear Model</h1>
@@ -377,17 +374,20 @@ Phillip M. Alday
 <li><span class="math inline">\(a\)</span> has mean 0</li>
 <li><span class="math inline">\(b\)</span> has mean 1</li>
 </ul>
+</section>
+<section class="slide level2">
+
 <div class="cell" data-execution_count="3">
 
-<div class="cell-output cell-output-display" data-execution_count="3">
+<div class="cell-output cell-output-display" data-execution_count="220">
 <pre><code>CairoMakie.Screen{IMAGE}</code></pre>
 </div>
 </div>
 <img data-src="presentation_files/figure-revealjs/cell-3-output-1.svg" class="r-stretch"></section>
-<section id="t-test-and-anova" class="slide level2">
-<h2>t-test and ANOVA</h2>
+<section id="t-test" class="slide level2">
+<h2>t-test</h2>
 <div class="cell" data-execution_count="4">
-<div class="cell-output cell-output-display" data-execution_count="4">
+<div class="cell-output cell-output-display" data-execution_count="221">
 <pre><code>Two sample t-test (equal variance)
 ----------------------------------
 Population details:
@@ -407,8 +407,11 @@ Details:
     empirical standard error: 0.2861791307330337</code></pre>
 </div>
 </div>
+</section>
+<section id="anova" class="slide level2">
+<h2>ANOVA</h2>
 <div class="cell" data-execution_count="5">
-<div class="cell-output cell-output-display" data-execution_count="5">
+<div class="cell-output cell-output-display" data-execution_count="222">
 <pre><code>One-way analysis of variance (ANOVA) test
 -----------------------------------------
 Population details:
@@ -431,53 +434,17 @@ Details:
 <h2>Linear regression</h2>
 <h3 id="treatment-i.e.-dummy-coding">treatment, i.e.&nbsp;dummy coding</h3>
 <div class="cell" data-execution_count="6">
-<div class="cell-output cell-output-display" data-execution_count="6">
-<table>
-<colgroup>
-<col style="width: 17%">
-<col style="width: 14%">
-<col style="width: 16%">
-<col style="width: 9%">
-<col style="width: 13%">
-<col style="width: 14%">
-<col style="width: 14%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;"></th>
-<th style="text-align: right;">Coef.</th>
-<th style="text-align: right;">Std. Error</th>
-<th style="text-align: right;">t</th>
-<th style="text-align: left;">Pr(&gt;</th>
-<th style="text-align: left;">t</th>
-<th style="text-align: right;">)</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">(Intercept)</td>
-<td style="text-align: right;">-0.229102</td>
-<td style="text-align: right;">0.202359</td>
-<td style="text-align: right;">-1.13</td>
-<td style="text-align: left;">0.2724</td>
-<td style="text-align: left;">-0.654243</td>
-<td style="text-align: right;">0.196039</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">x: b</td>
-<td style="text-align: right;">1.12202</td>
-<td style="text-align: right;">0.286179</td>
-<td style="text-align: right;">3.92</td>
-<td style="text-align: left;">0.0010</td>
-<td style="text-align: left;">0.520778</td>
-<td style="text-align: right;">1.72326</td>
-</tr>
-</tbody>
-</table>
+<div class="cell-output cell-output-stdout">
+<pre><code>─────────────────────────────────────────────────────────────────────────
+                 Coef.  Std. Error      t  Pr(&gt;|t|)  Lower 95%  Upper 95%
+─────────────────────────────────────────────────────────────────────────
+(Intercept)  -0.229102    0.202359  -1.13    0.2724  -0.654243   0.196039
+x: b          1.12202     0.286179   3.92    0.0010   0.520778   1.72326
+─────────────────────────────────────────────────────────────────────────</code></pre>
 </div>
 </div>
 <div class="cell" data-execution_count="7">
-<div class="cell-output cell-output-display" data-execution_count="7">
+<div class="cell-output cell-output-display" data-execution_count="224">
 <pre><code>F-test against the null model:
 F-statistic: 15.37 on 20 observations and 1 degrees of freedom, p-value: 0.0010</code></pre>
 </div>
@@ -487,53 +454,17 @@ F-statistic: 15.37 on 20 observations and 1 degrees of freedom, p-value: 0.0010<
 <h2>Linear regression</h2>
 <h3 id="effects-i.e.-sum-coding">effects, i.e.&nbsp;sum coding</h3>
 <div class="cell" data-execution_count="8">
-<div class="cell-output cell-output-display" data-execution_count="8">
-<table>
-<colgroup>
-<col style="width: 17%">
-<col style="width: 13%">
-<col style="width: 16%">
-<col style="width: 8%">
-<col style="width: 13%">
-<col style="width: 15%">
-<col style="width: 15%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;"></th>
-<th style="text-align: right;">Coef.</th>
-<th style="text-align: right;">Std. Error</th>
-<th style="text-align: right;">t</th>
-<th style="text-align: left;">Pr(&gt;</th>
-<th style="text-align: left;">t</th>
-<th style="text-align: right;">)</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">(Intercept)</td>
-<td style="text-align: right;">0.331907</td>
-<td style="text-align: right;">0.14309</td>
-<td style="text-align: right;">2.32</td>
-<td style="text-align: left;">0.0323</td>
-<td style="text-align: left;">0.0312873</td>
-<td style="text-align: right;">0.632527</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">x: b</td>
-<td style="text-align: right;">0.561009</td>
-<td style="text-align: right;">0.14309</td>
-<td style="text-align: right;">3.92</td>
-<td style="text-align: left;">0.0010</td>
-<td style="text-align: left;">0.260389</td>
-<td style="text-align: right;">0.861629</td>
-</tr>
-</tbody>
-</table>
+<div class="cell-output cell-output-stdout">
+<pre><code>───────────────────────────────────────────────────────────────────────
+                Coef.  Std. Error     t  Pr(&gt;|t|)  Lower 95%  Upper 95%
+───────────────────────────────────────────────────────────────────────
+(Intercept)  0.331907     0.14309  2.32    0.0323  0.0312873   0.632527
+x: b         0.561009     0.14309  3.92    0.0010  0.260389    0.861629
+───────────────────────────────────────────────────────────────────────</code></pre>
 </div>
 </div>
 <div class="cell" data-execution_count="9">
-<div class="cell-output cell-output-display" data-execution_count="9">
+<div class="cell-output cell-output-display" data-execution_count="226">
 <pre><code>F-test against the null model:
 F-statistic: 15.37 on 20 observations and 1 degrees of freedom, p-value: 0.0010</code></pre>
 </div>
@@ -543,49 +474,13 @@ F-statistic: 15.37 on 20 observations and 1 degrees of freedom, p-value: 0.0010<
 <h2>Linear regression</h2>
 <h3 id="full-dummy-coding-i.e.-one-hot-i.e.-dummy-coding-without-an-intercept">full dummy coding, i.e.&nbsp;one-hot, i.e.&nbsp;dummy coding without an intercept</h3>
 <div class="cell" data-execution_count="10">
-<div class="cell-output cell-output-display" data-execution_count="10">
-<table>
-<colgroup>
-<col style="width: 8%">
-<col style="width: 16%">
-<col style="width: 17%">
-<col style="width: 10%">
-<col style="width: 14%">
-<col style="width: 16%">
-<col style="width: 16%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;"></th>
-<th style="text-align: right;">Coef.</th>
-<th style="text-align: right;">Std. Error</th>
-<th style="text-align: right;">t</th>
-<th style="text-align: left;">Pr(&gt;</th>
-<th style="text-align: left;">t</th>
-<th style="text-align: right;">)</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">x: a</td>
-<td style="text-align: right;">-0.229102</td>
-<td style="text-align: right;">0.202359</td>
-<td style="text-align: right;">-1.13</td>
-<td style="text-align: left;">0.2724</td>
-<td style="text-align: left;">-0.654243</td>
-<td style="text-align: right;">0.196039</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">x: b</td>
-<td style="text-align: right;">0.892916</td>
-<td style="text-align: right;">0.202359</td>
-<td style="text-align: right;">4.41</td>
-<td style="text-align: left;">0.0003</td>
-<td style="text-align: left;">0.467775</td>
-<td style="text-align: right;">1.31806</td>
-</tr>
-</tbody>
-</table>
+<div class="cell-output cell-output-stdout">
+<pre><code>──────────────────────────────────────────────────────────────────
+          Coef.  Std. Error      t  Pr(&gt;|t|)  Lower 95%  Upper 95%
+──────────────────────────────────────────────────────────────────
+x: a  -0.229102    0.202359  -1.13    0.2724  -0.654243   0.196039
+x: b   0.892916    0.202359   4.41    0.0003   0.467775   1.31806
+──────────────────────────────────────────────────────────────────</code></pre>
 </div>
 </div>
 </section>
@@ -594,73 +489,38 @@ F-statistic: 15.37 on 20 observations and 1 degrees of freedom, p-value: 0.0010<
 <ul>
 <li>group <span class="math inline">\(c\)</span> with true mean -1, true variance 1</li>
 </ul>
-<h3 id="dummy-coding">dummy coding</h3>
 <div class="cell" data-execution_count="11">
-<div class="cell-output cell-output-display" data-execution_count="11">
-<table>
-<colgroup>
-<col style="width: 17%">
-<col style="width: 14%">
-<col style="width: 16%">
-<col style="width: 9%">
-<col style="width: 13%">
-<col style="width: 14%">
-<col style="width: 14%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;"></th>
-<th style="text-align: right;">Coef.</th>
-<th style="text-align: right;">Std. Error</th>
-<th style="text-align: right;">t</th>
-<th style="text-align: left;">Pr(&gt;</th>
-<th style="text-align: left;">t</th>
-<th style="text-align: right;">)</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">(Intercept)</td>
-<td style="text-align: right;">-0.229102</td>
-<td style="text-align: right;">0.214824</td>
-<td style="text-align: right;">-1.07</td>
-<td style="text-align: left;">0.2957</td>
-<td style="text-align: left;">-0.669883</td>
-<td style="text-align: right;">0.21168</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">x: b</td>
-<td style="text-align: right;">1.12202</td>
-<td style="text-align: right;">0.303806</td>
-<td style="text-align: right;">3.69</td>
-<td style="text-align: left;">0.0010</td>
-<td style="text-align: left;">0.498659</td>
-<td style="text-align: right;">1.74538</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">x: c</td>
-<td style="text-align: right;">-0.184637</td>
-<td style="text-align: right;">0.303806</td>
-<td style="text-align: right;">-0.61</td>
-<td style="text-align: left;">0.5484</td>
-<td style="text-align: left;">-0.807997</td>
-<td style="text-align: right;">0.438722</td>
-</tr>
-</tbody>
-</table>
+
+<div class="cell-output cell-output-display" data-execution_count="228">
+<pre><code>CairoMakie.Screen{IMAGE}</code></pre>
 </div>
 </div>
+<img data-src="presentation_files/figure-revealjs/cell-11-output-1.svg" class="r-stretch"></section>
+<section id="linear-regression-3" class="slide level2">
+<h2>Linear regression</h2>
+<h3 id="dummy-coding">dummy coding</h3>
 <div class="cell" data-execution_count="12">
-<div class="cell-output cell-output-display" data-execution_count="12">
+<div class="cell-output cell-output-stdout">
+<pre><code>─────────────────────────────────────────────────────────────────────────
+                 Coef.  Std. Error      t  Pr(&gt;|t|)  Lower 95%  Upper 95%
+─────────────────────────────────────────────────────────────────────────
+(Intercept)  -0.229102    0.214824  -1.07    0.2957  -0.669883   0.21168
+x: b          1.12202     0.303806   3.69    0.0010   0.498659   1.74538
+x: c         -0.184637    0.303806  -0.61    0.5484  -0.807997   0.438722
+─────────────────────────────────────────────────────────────────────────</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="13">
+<div class="cell-output cell-output-display" data-execution_count="230">
 <pre><code>F-test against the null model:
 F-statistic: 10.84 on 30 observations and 2 degrees of freedom, p-value: 0.0004</code></pre>
 </div>
 </div>
 </section>
-<section class="slide level2">
-
-<div class="cell" data-execution_count="13">
-<div class="cell-output cell-output-display" data-execution_count="13">
+<section id="anova-1" class="slide level2">
+<h2>ANOVA</h2>
+<div class="cell" data-execution_count="14">
+<div class="cell-output cell-output-display" data-execution_count="231">
 <pre><code>One-way analysis of variance (ANOVA) test
 -----------------------------------------
 Population details:
@@ -714,17 +574,17 @@ Details:
 <li><span class="math inline">\(a\)</span> has mean 0</li>
 <li><span class="math inline">\(b\)</span> has mean 1</li>
 </ul>
-<div class="cell" data-execution_count="14">
+<div class="cell" data-execution_count="15">
 
-<div class="cell-output cell-output-display" data-execution_count="14">
+<div class="cell-output cell-output-display" data-execution_count="232">
 <pre><code>CairoMakie.Screen{IMAGE}</code></pre>
 </div>
 </div>
-<img data-src="presentation_files/figure-revealjs/cell-14-output-1.svg" class="r-stretch"></section>
+<img data-src="presentation_files/figure-revealjs/cell-15-output-1.svg" class="r-stretch"></section>
 <section id="paired-samples-t-test" class="slide level2">
 <h2>Paired samples t-test</h2>
-<div class="cell" data-execution_count="15">
-<div class="cell-output cell-output-display" data-execution_count="15">
+<div class="cell" data-execution_count="16">
+<div class="cell-output cell-output-display" data-execution_count="233">
 <pre><code>One sample t-test
 -----------------
 Population details:
@@ -747,8 +607,8 @@ Details:
 </section>
 <section id="one-sample-t-test-on-the-difference" class="slide level2">
 <h2>One-sample t-test on the difference</h2>
-<div class="cell" data-execution_count="16">
-<div class="cell-output cell-output-display" data-execution_count="16">
+<div class="cell" data-execution_count="17">
+<div class="cell-output cell-output-display" data-execution_count="234">
 <pre><code>One sample t-test
 -----------------
 Population details:
@@ -771,8 +631,8 @@ Details:
 </section>
 <section id="linear-regression-on-the-difference" class="slide level2">
 <h2>Linear regression on the difference</h2>
-<div class="cell" data-execution_count="17">
-<div class="cell-output cell-output-display" data-execution_count="17">
+<div class="cell" data-execution_count="18">
+<div class="cell-output cell-output-display" data-execution_count="235">
 <table>
 <colgroup>
 <col style="width: 17%">
@@ -874,26 +734,26 @@ Details:
 </section>
 <section id="classic-example-dataset-sleepstudy-1" class="slide level2">
 <h2>Classic example dataset: sleepstudy</h2>
-<div class="cell" data-execution_count="18">
-
-<div class="cell-output cell-output-display" data-execution_count="18">
-<pre><code>CairoMakie.Screen{IMAGE}</code></pre>
-</div>
-</div>
-<img data-src="presentation_files/figure-revealjs/cell-18-output-1.svg" class="r-stretch"></section>
-<section id="classic-example-dataset-sleepstudy-2" class="slide level2">
-<h2>Classic example dataset: sleepstudy</h2>
 <div class="cell" data-execution_count="19">
 
-<div class="cell-output cell-output-display" data-execution_count="19">
+<div class="cell-output cell-output-display" data-execution_count="236">
 <pre><code>CairoMakie.Screen{IMAGE}</code></pre>
 </div>
 </div>
 <img data-src="presentation_files/figure-revealjs/cell-19-output-1.svg" class="r-stretch"></section>
+<section id="classic-example-dataset-sleepstudy-2" class="slide level2">
+<h2>Classic example dataset: sleepstudy</h2>
+<div class="cell" data-execution_count="20">
+
+<div class="cell-output cell-output-display" data-execution_count="237">
+<pre><code>CairoMakie.Screen{IMAGE}</code></pre>
+</div>
+</div>
+<img data-src="presentation_files/figure-revealjs/cell-20-output-1.svg" class="r-stretch"></section>
 <section id="paritioning-between-within-variance" class="slide level2">
 <h2>Paritioning between-within variance</h2>
-<div class="cell" data-execution_count="20">
-<div class="cell-output cell-output-display" data-execution_count="20">
+<div class="cell" data-execution_count="21">
+<div class="cell-output cell-output-display" data-execution_count="238">
 <table>
 <thead>
 <tr class="header">
@@ -938,27 +798,27 @@ Details:
 <section id="shrinkage-and-borrowing-strength" class="slide level2">
 <h2>Shrinkage and borrowing strength</h2>
 
-<img data-src="presentation_files/figure-revealjs/cell-21-output-1.svg" class="r-stretch"></section>
+<img data-src="presentation_files/figure-revealjs/cell-22-output-1.svg" class="r-stretch"></section>
 <section id="shrinkage-and-borrowing-strength-most-changed" class="slide level2">
 <h2>Shrinkage and borrowing strength: most changed</h2>
 
-<img data-src="presentation_files/figure-revealjs/cell-22-output-1.svg" class="r-stretch"></section>
+<img data-src="presentation_files/figure-revealjs/cell-23-output-1.svg" class="r-stretch"></section>
 <section id="shrinkage-and-borrowing-strength-moderately-changed" class="slide level2">
 <h2>Shrinkage and borrowing strength: moderately changed</h2>
 
-<img data-src="presentation_files/figure-revealjs/cell-23-output-1.svg" class="r-stretch"></section>
+<img data-src="presentation_files/figure-revealjs/cell-24-output-1.svg" class="r-stretch"></section>
 <section id="shrinkage-and-borrowing-strength-least-changed" class="slide level2">
 <h2>Shrinkage and borrowing strength: least changed</h2>
 
-<img data-src="presentation_files/figure-revealjs/cell-24-output-1.svg" class="r-stretch"></section>
+<img data-src="presentation_files/figure-revealjs/cell-25-output-1.svg" class="r-stretch"></section>
 <section id="shrinkage-and-borrowing-strength-1" class="slide level2">
 <h2>Shrinkage and borrowing strength</h2>
 
-<img data-src="presentation_files/figure-revealjs/cell-25-output-1.svg" class="r-stretch"></section>
+<img data-src="presentation_files/figure-revealjs/cell-26-output-1.svg" class="r-stretch"></section>
 <section id="subject-level-predictions" class="slide level2">
 <h2>Subject-level <em>predictions</em></h2>
 
-<img data-src="presentation_files/figure-revealjs/cell-26-output-1.svg" class="r-stretch"></section>
+<img data-src="presentation_files/figure-revealjs/cell-27-output-1.svg" class="r-stretch"></section>
 <section id="and-many-more-reasons" class="slide level2">
 <h2>And many more reasons!</h2>
 <ul>
