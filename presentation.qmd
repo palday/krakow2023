@@ -1,0 +1,63 @@
+---
+title: "Mixed models: why or why not?"
+subtitle: "(But probably why yes!)"
+author: Phillip M. Alday
+institute: Beacon Biosignals
+format: revealjs
+---
+
+
+# The General Linear Model
+
+## Classical tests are all regression in disguise
+
+
+
+Xoshiro(42)
+
+https://lindeloev.github.io/tests-as-linear/
+
+## But what about repeated measures?
+
+- paired samples t-test ....
+
+Mixed models are a powerful statistical tool for modeling repeated measures data, including panel or longitudinal data. Like any powerful tool, mixed models require some expertise to be wielded effectively.Nonetheless, they remain a mystery to many researchers, both in interpretation and practical application. In this talk, I will present mixed models as a natural extension of classical regression. I will discuss some of the advantages of mixed models compared to ANOVA. I will also point out where pitfalls lie for those coming from classical repeated measures ANOVA, for example contrast coding and binomial responses, as well how these problems are also present but often ignored in the ANOVA framework (e.g. types of sums of squares; use of ANOVA with inappropriately distributed data) I'll also discuss a few current controversies and challenges surrounding mixed models such as random-effects selection, singular fits, and convergence. This will be a relatively high level talk to provide intuitions about mixed models as a tool and thus empower attendees to make informed decisions about whether mixed models are a tool that they should learn more about and adopt. I will include a number of references for further reading and learning.
+
+# Regression and repeated measures
+
+## Within-units regression
+
+## Mixed-effects Models
+
+# Why mixed models?
+
+## Shrinkage and borrowing strength
+
+## Parismony (fewer parameter)
+
+## Paritioning between-within variance
+
+## Multiple levels: (partial) crossing and nesting
+
+## One unified framework
+
+- Normal and non normal responses
+- Mixture of categorical and continuous predictors
+- Balance isnt' an issue
+
+# Why not mixed models?
+
+(what you need to watch out for when moving to mixed models)
+
+## Contrast coding
+
+## Random-effects selection
+
+## Convergence
+
+## Degrees of freedom and p-values
+
+## Breakdown of classical stats
+
+
+## Compute time
