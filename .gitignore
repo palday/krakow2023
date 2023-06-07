@@ -24,9 +24,15 @@ docs/site/
 # Manifest.toml
 
 presentation_files/
+
+# scratch files
 *.swp
 .*~
+
+# quarto outputs
 presentation.html
 presentation.pdf
 presentation.pptx
-
+*.ipynb
+__version__.txt
+global.db
