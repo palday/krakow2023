@@ -1,0 +1,355 @@
+---
+title: "Mixed models: why or why not?"
+subtitle: "(But probably why yes!)"
+author: Phillip M. Alday
+institute: Beacon Biosignals
+format: revealjs
+slide-number: true
+progress: true
+hashOneBasedIndex: true
+code-fold: true
+bibliography: pubs.bib
+jupyter: julia-1.9
+execute:
+  cache: true
+  freeze: auto
+scrollable: true
+---
+
+```{julia}
+using AlgebraOfGraphics
+using CairoMakie
+using DataFrames
+using Distributions
+using Effects
+using GLM
+using HypothesisTests
+using MixedModels
+using MixedModelsExtras
+using MixedModelsMakie
+using Random
+using RegressionFormulae
+using StandardizedPredictors
+```
+
+
+# The General Linear Model
+
+## Classical tests are all regression in disguise
+
+- See more examples of this at: https://lindeloev.github.io/tests-as-linear/
+- Two independent samples of 10 elements
+- Both true variance of 1
+- $a$ has mean 0
+- $b$ has mean 1
+
+---
+
+```{julia}
+rng = Xoshiro(42)
+a = randn(rng, 10)
+b = randn(rng, 10) .+ 1
+df = DataFrame(;x=repeat(["a", "b"]; inner=10), y=[a;b])
+plt = data(df) * mapping(:y; color=:x, fill=:x) * AlgebraOfGraphics.density()
+display(draw(plt))
+```
+
+## t-test
+
+```{julia}
+EqualVarianceTTest(a,b)
+```
+
+## ANOVA
+```{julia}
+HypothesisTests.OneWayANOVATest(a,b)
+```
+
+## Linear regression
+
+### treatment, i.e. dummy coding
+
+```{julia}
+println(coeftable(lm(@formula(y ~ 1 + x), df)))
+```
+
+```{julia}
+ftest(lm(@formula(y ~ 1 + x), df).model)
+```
+
+## Linear regression
+
+### effects, i.e. sum coding
+
+```{julia}
+println(coeftable(lm(@formula(y ~ 1 + x), df; contrasts=Dict(:x => EffectsCoding()))))
+```
+
+```{julia}
+ftest(lm(@formula(y ~ 1 + x), df; contrasts=Dict(:x => EffectsCoding())).model)
+```
+
+## Linear regression
+
+### full dummy coding, i.e. one-hot, i.e. dummy coding without an intercept
+
+```{julia}
+println(coeftable(lm(@formula(y ~ 0 + x), df)))
+```
+
+## What happens with more than 3+ groups?
+- group $c$ with true mean -1, true variance  1
+
+```{julia}
+c = randn(rng, 10) .+ -1
+df2 = DataFrame(;x=Ref("c"),y=c)
+df2 = vcat(df, df2)
+plt = data(df2) * mapping(:y; color=:x, fill=:x) * AlgebraOfGraphics.density()
+display(draw(plt))
+```
+
+## Linear regression
+
+### dummy coding
+
+```{julia}
+println(coeftable(lm(@formula(y ~ 1 + x), df2)))
+```
+
+```{julia}
+ftest(lm(@formula(y ~ 1 + x), df2).model)
+```
+
+## ANOVA
+
+```{julia}
+OneWayANOVATest(a, b, c)
+```
+
+## Explicit regression gives you more control than classical tests
+
+- but also more responsibility!
+- you can test distinct but related hypotheses
+- you get explicit estimates of effect sizes
+- you can customize different parts of the model to get variations
+    - mixture of continuous and categorical predictors (ANOVA + ANCOVA)
+    - control which interactions are present
+    - interactions are resolved as part of a single step: no post-hoc t-test necessary
+    - control over the 'family' / response distribution to model e.g. yes/no responses (binomial), counts (Poisson), etc.
+- relationship of ANOVA tests and t-tests more explicit
+    - ANOVA is an omnibus test
+    - t-tests are individual contrasts
+    - more complicated tests are variations on model comparisons
+- contrasts can be hard but...
+    - they are no harder than your research question
+    - explicit choice of contrasts and model comparison more informative than the types of sums of squares
+- lack of balance not a problem
+
+## But what about repeated measures?
+
+- Two **dependent*** samples of 10 elements
+- Both true variance of 1
+- $a$ has mean 0
+- $b$ has mean 1
+
+```{julia}
+rng = Xoshiro(42)
+plt = data(df) * mapping(:y; color=:x, fill=:x) * AlgebraOfGraphics.density()
+display(draw(plt))
+```
+
+## Paired samples t-test
+
+```{julia}
+OneSampleTTest(a, b)
+```
+
+## One-sample t-test on the difference
+
+```{julia}
+OneSampleTTest(a .- b)
+```
+
+
+## Linear regression on the difference
+
+```{julia}
+coeftable(lm(@formula(y ~ 1), (; y=(a .- b))))
+```
+
+## Pairwise differences are not easily generalizable
+- what happens if we have 3+ groups? (rmANOVA ✔)
+- what happens if our covariates change from one measurement to the next within groups? (rmANOVA ✔ between vs. within variables)
+- what happens if we have more than 2 measurements per group? (rmANOVA ✔)
+- what if some groups are missing one or more measurements? (rmANOVA ❓)
+- what happens if there are multiple grouping variables? (rmANOVA ❌)
+- what happens if the conditional distribution is not normal? (rmANOVA ❌)
+
+# Regression and repeated measures
+
+## Strategies with classical regression
+
+### within-groups regression
+
+- aggregating within-group results may not propagate error correctly
+- all groups treated equal
+- unable to handle more complex grouping structures
+- separate by-item and by-subject analyses as a potential stopgap
+- no pooling of information between groups
+
+### ignore grouping structure or include group as covariate (complete pooling)
+
+- violates independence assumption
+- standard errors incorrect (too small)
+- if group included as categorical variable, explosion in number of parameters
+    - more complicated to interpret
+    - lower power
+- all observations treated equal
+- complete pooling of information between groups
+
+## Mixed-effects Models
+
+- can handle more complicated grouping structures
+- can handle imbalance at all levels
+- better group-level *predictions*
+- can handle both between and within variables seemlessly
+- partitioning of group vs. observation variance based on the evidence
+- partial pooling of information between groups
+
+# Why mixed models?
+
+## Classic example dataset: sleepstudy
+
+- reaction time study following $x$ days of sleep restriction
+- on average, we expect a worsening of reaction time over several days
+- individuals may differ in baseline reaction time or worsening
+
+## Classic example dataset: sleepstudy
+```{julia}
+sleepstudy = MixedModels.dataset(:sleepstudy)
+splt = data(sleepstudy) * mapping(:days, :reaction; layout=:subj) * visual(Scatter)
+display(draw(splt))
+```
+
+
+## Classic example dataset: sleepstudy
+```{julia}
+splt = data(sleepstudy) * mapping(:days, :reaction; layout=:subj)
+splt *= visual(Scatter) + linear(; interval=nothing)
+display(draw(splt))
+```
+
+## Paritioning between-within variance
+
+```{julia}
+fm1 = fit(MixedModel, @formula(reaction ~ 1 + days + (1+days|subj)), sleepstudy)
+```
+
+## Shrinkage and borrowing strength
+
+```{julia}
+slp = DataFrame(sleepstudy)
+# rename!(slp, :reaction => :observed)
+linreg(tbl) = fitted(lm(@formula(reaction ~ 1 + days), tbl))
+select!(groupby(slp, :subj), :, AsTable([:days, :reaction]) => linreg => "OLS")
+slp[!, "mixed model"] .= fitted(fm1)
+slp[!, "population"] .= modelmatrix(fm1) * coef(fm1)
+slp = stack(slp, Not([:subj, :days, :reaction]);
+            variable_name="model", value_name=:y)
+splt = data(slp) * mapping(:days; layout=:subj)
+scat = mapping(:reaction) * visual(Scatter)
+mods = mapping(:y; color=:model) * visual(Lines)
+draw(splt * (scat + mods), legend=(position=:top,framevisible=true, padding=5))
+```
+
+
+## Shrinkage and borrowing strength: most changed
+```{julia}
+extreme = sort!(DataFrame(shrinkagenorm(fm1)[:subj]), :shrinkage)[13:end, :subj]
+slp2 = filter(:subj => in(extreme), slp)
+splt = data(slp2) * mapping(:days; layout=:subj)
+scat = mapping(:reaction) * visual(Scatter)
+mods = mapping(:y; color=:model) * visual(Lines)
+draw(splt * (scat + mods), legend=(position=:top,framevisible=true, padding=5))
+```
+
+## Shrinkage and borrowing strength: moderately changed
+
+```{julia}
+extreme = sort!(DataFrame(shrinkagenorm(fm1)[:subj]), :shrinkage)[7:12, :subj]
+slp2 = filter(:subj => in(extreme), slp)
+splt = data(slp2) * mapping(:days; layout=:subj)
+scat = mapping(:reaction) * visual(Scatter)
+mods = mapping(:y; color=:model) * visual(Lines)
+draw(splt * (scat + mods), legend=(position=:top,framevisible=true, padding=5))
+```
+
+## Shrinkage and borrowing strength: least changed
+
+```{julia}
+extreme = sort!(DataFrame(shrinkagenorm(fm1)[:subj]), :shrinkage)[1:6, :subj]
+slp2 = filter(:subj => in(extreme), slp)
+splt = data(slp2) * mapping(:days; layout=:subj)
+scat = mapping(:reaction) * visual(Scatter)
+mods = mapping(:y; color=:model) * visual(Lines)
+draw(splt * (scat + mods), legend=(position=:top,framevisible=true, padding=5))
+```
+
+## Shrinkage and borrowing strength
+
+```{julia}
+shrinkageplot(fm1; ellipse=true)
+```
+
+## Subject-level *predictions*
+
+```{julia}
+caterpillar(fm1)
+```
+
+
+## And many more reasons!
+- Multiple levels: (partial) crossing and nesting
+- Parsimony
+- One unified framework
+    - Normal and non normal responses
+    - Mixture of categorical and continuous predictors
+    - Balance isnt' an issue
+- Explicit model:
+    - effect estimates
+    - easier to see impact of potential violations of assumptions
+    - much clearer distinction between signifance and explanatory power
+
+# Why not mixed models?
+
+(what you need to watch out for when moving to mixed models)
+
+## Contrast coding
+- Hinted at earlier, but contrast coding requires thinking rather explicitly about your actual hypotheses beyond "there is a difference somewhere"
+- Results in the literature are not interpretable without knowing the contrast scheme used [@brehm_contrast_2022]
+- Same problem existed historically for ANOVA -- results are no interpretable without knowing whether Type I, II, or III sums of squares were used
+- Good tutorial in R: @schad_how_2020
+
+## Random-effects selection
+
+- This is a huge topic and the source of a long debate.
+- There are problems with many of the proposed rules of thumb because rules of thumb often ignore tradeoffs
+- See also @baayen_mixed-effects_2008, @matuschek_balancing_2017, @bates_parsimonious_2018, @bates_complexity_2019
+
+## Convergence, compute time and the computational vs. statistical problems
+- Unlike classical tests and OLS regression, which are based on direct computations, mixed models require a more complicated fitting process
+    - This can break down in various ways
+    - This can take substantially longer than ANOVA
+- Breakdowns of the fitting process can often be solved by better understanding the warnings and the deeper meaning of statistics in question
+- Overly cautious warnings in some software (e.g. lme4) have often been intepreted as a failure in software instead of a statement about the statistical problem (see also https://rpubs.com/palday/lme4-singular-convergence)
+- [Folk Theorem of Statistical Computing (Gelman)](https://statmodeling.stat.columbia.edu/2008/05/13/the_folk_theore/): When you have computational problems, often there’s a problem with your model
+
+## Breakdown of some overly simple definitions from introductory statistics
+- "degrees of freedom" no longer a trivial concept
+- p-values often depend on degrees of freedom, so they are now more difficult
+- largely averted by using confidence intervals [see also @cumming_new_2014]
+- $R^2$ and standardized effect sizes are also more challenging, see e.g.
+    [these](https://afex.singmann.science/forums/topic/compute-effect-sizes-for-mixed-objects#post-295) [links](https://bbolker.github.io/mixedmodels-misc/glmmFAQ.html#how-do-i-compute-a-coefficient-of-determination-r2-or-an-analogue-for-glmms).
+
+
+# References
